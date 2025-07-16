@@ -1,15 +1,16 @@
 import express from "express";
 import mongoose from "mongoose";
-import userRouter from "./routes/userRoute.js";
 import dotenv from "dotenv";
+import userRouter from "./routes/userRoute.js";
+import productRouter from "./routes/productRoute.js";
+import orderRouter from "./routes/orderRoute.js"
 import cors from "cors";
 dotenv.config();
 const app = express();
+app.use(cors());
 app.use(express.json());
-app.use(cors())
-
-const dbuser = encodeURIComponent(process.env.DBUSER)
-const dbpass = encodeURIComponent(process.env.DBPASS)
+const dbuser = encodeURIComponent(process.env.DBUSER);
+const dbpass = encodeURIComponent(process.env.DBPASS);
 
 mongoose.connect("mongodb://localhost:27017/mern-cafe").then(() => {
   app.listen(8080, () => {
@@ -26,3 +27,5 @@ mongoose.connect("mongodb://localhost:27017/mern-cafe").then(() => {
   // });
 
 app.use("/api/users", userRouter);
+app.use("/api/products", productRouter);
+app.use("/api/orders", orderRouter)

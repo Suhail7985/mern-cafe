@@ -9,12 +9,21 @@ import {
   deleteUser,
   showUsers,
   updateProfile,
+  getUser,
+  addUser,
 } from "../controllers/userController.js";
+
+//user routes
 Router.post("/register", register);
 Router.post("/login", login);
-Router.get("/", showUsers);
-Router.patch("/:id",  updateUser);
-Router.delete("/:id", deleteUser);
-Router.get("/:id/profile", authenticate, profile);
-Router.get("/:id/profile",authenticate,updateProfile)
+Router.get("/:id/profile", profile);
+Router.patch("/:id/profile", updateProfile);
+
+//admin routes
+Router.get("/", authenticate, authorize("admin"), showUsers);
+Router.post("/", authenticate, authorize("admin"), addUser);
+Router.get("/:id", authenticate, authorize("admin"), getUser);
+Router.patch("/:id", authenticate, authorize("admin"), updateUser);
+Router.delete("/:id", authenticate, authorize("admin"), deleteUser);
+
 export default Router;
