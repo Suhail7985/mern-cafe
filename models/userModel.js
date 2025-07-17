@@ -7,6 +7,7 @@ const userSchema = mongoose.Schema(
     password: { type: String },
     status   : { type: String, enum: ["active", "inactive"], default: "active" },
     role: { type: String, default: "user" },
+    phoneNo: { type: String },
     
   },
   { timestamps: true }
