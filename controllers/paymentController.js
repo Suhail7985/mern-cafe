@@ -67,6 +67,41 @@ const verifyPayment = async (req, res) => {
   }
 };
 
-export { createOrder, verifyPayment };
+const getPaymentStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    
+    if (!orderId) {
+      return res.status(400).json({ 
+        success: false,
+        message: "Order ID is required." 
+      });
+    }
+
+    const instance = createRazorpayInstance();
+    const order = await instance.orders.fetch(orderId);
+
+    return res.status(200).json({
+      success: true,
+      order: {
+        id: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        status: order.status,
+        receipt: order.receipt,
+        created_at: order.created_at
+      }
+    });
+  } catch (err) {
+    console.error("Error fetching payment status:", err);
+    return res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch payment status.",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+};
+
+export { createOrder, verifyPayment, getPaymentStatus };
 
 

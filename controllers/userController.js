@@ -114,7 +114,7 @@ const updateProfile = async (req, res) => {
     // const { firstname, lastname, email, password } = req.body;
     const body = req.body;
     if (body.password) {
-      const hashedpwd = await bcrypt.hash(password, 10);
+      const hashedpwd = await bcrypt.hash(body.password, 10);
       body.password = hashedpwd;
     }
     const result = await userModel.findByIdAndUpdate(id, body);
