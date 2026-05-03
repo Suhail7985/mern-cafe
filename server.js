@@ -22,14 +22,20 @@ const dbpass = encodeURIComponent(process.env.DBPASS);
 
 
 
-  mongoose.connect(process.env.MONGODB_URI).then(() => {
-    app.listen(8080, () => {
-      console.log("Server started");
-    });
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log(err));
+
+if (process.env.NODE_ENV !== "production") {
+  app.listen(8080, () => {
+    console.log("Server started on port 8080");
   });
+}
 
 app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/payments", paymentRouter);
 app.use("/api/newsletter", subscriberRouter);
+
+export default app;
