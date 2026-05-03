@@ -22,7 +22,7 @@ const dbpass = encodeURIComponent(process.env.DBPASS);
 
 
 
-  mongoose.connect(`mongodb+srv://${dbuser}:${dbpass}@cluster0.rcpg0eg.mongodb.net/mern-cafe?retryWrites=true&w=majority&appName=Cluster0`).then(() => {
+  mongoose.connect(process.env.MONGODB_URI).then(() => {
     app.listen(8080, () => {
       console.log("Server started");
     });

@@ -1,15 +1,19 @@
 import jwt from "jsonwebtoken";
-const SECRET = "something";
+const SECRET = process.env.JWT_SECRET || "something";
 
 const authenticate = (req, res, next) => {
   try {
     let token = req.headers.authorization;
+    if (!token) {
+      return res.status(401).json({ message: "Access Denied - No token provided" });
+    }
     token = token.split(" ")[1];
     const user = jwt.verify(token, SECRET);
+    req.user = user; // Set full user object
     req.role = user.role;
     next();
   } catch (err) {
-    return res.json({ message: "Access Denied" });
+    return res.status(401).json({ message: "Access Denied - Invalid token" });
   }
 };
 

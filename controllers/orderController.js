@@ -3,6 +3,9 @@ import orderModel from "../models/orderModel.js";
 const newOrder = async (req, res) => {
   try {
     const body = req.body;
+    // Add user info from JWT
+    body.userId = req.user.id;
+    body.email = req.user.email;
     const result = await orderModel.create(body);
     res.status(201).json(result);
   } catch (err) {
@@ -14,7 +17,7 @@ const newOrder = async (req, res) => {
 const showOrders = async (req, res) => {
   try {
     const id = req.params.id;
-    const result = await orderModel.find({ email: id });
+    const result = await orderModel.find({ email: id }).sort({ createdAt: -1 });
     res.status(200).json(result);
   } catch (err) {
     console.log(err);
@@ -32,8 +35,9 @@ const showAllOrders = async (req, res) => {
     const total = Math.ceil(count / limit);
     const orders = await orderModel
       .find({ status: { $regex: status, $options: "i" } })
+      .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit)
+      .limit(limit);
     res.status(200).json({ orders, total });
   } catch (err) {
     console.log(err);

@@ -16,8 +16,8 @@ import {
 //user routes
 Router.post("/register", register);
 Router.post("/login", login);
-Router.get("/:id/profile", profile);
-Router.patch("/:id/profile", updateProfile);
+Router.get("/:id/profile", authenticate, profile);
+Router.patch("/:id/profile", authenticate, updateProfile);
 
 //admin routes
 Router.get("/", authenticate, authorize("admin"), showUsers);

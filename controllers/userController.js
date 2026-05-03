@@ -2,17 +2,26 @@ import userModel from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import {ObjectId} from "mongoose"
 import jwt from "jsonwebtoken";
-const SECRET = "something";
+const SECRET = process.env.JWT_SECRET || "something";
+
+// Simple function to remove password
+const removePassword = (user) => {
+  if (!user) return user;
+  const { password, ...userWithoutPassword } = user.toObject ? user.toObject() : user;
+  return userWithoutPassword;
+};
+
 const profile = async (req, res) => {
   try {
     const id = req.params.id;
     const result = await userModel.findOne({ _id: id });
-    res.status(200).json(result);
+    res.status(200).json(removePassword(result));
   } catch (err) {
     console.log(err);
     res.status(400).json({ message: "Something went wrong" });
   }
 };
+
 const deleteUser = async (req, res) => {
   try {
     const id = req.params.id;
@@ -23,6 +32,7 @@ const deleteUser = async (req, res) => {
     res.status(400).json({ message: "Something went wrong" });
   }
 };
+
 const updateUser = async (req, res) => {
   try {
     const id = req.params.id;
@@ -31,7 +41,7 @@ const updateUser = async (req, res) => {
       body.password = await bcrypt.hash(body.password, 10);
     }
     const result = await userModel.findByIdAndUpdate(id, body);
-    res.status(200).json(result);
+    res.status(200).json(removePassword(result));
   } catch (err) {
     console.log(err);
     res.status(400).json({ message: "Something went wrong" });
@@ -42,7 +52,7 @@ const getUser = async (req, res) => {
   try {
     const id = req.params.id;
     const result = await userModel.findOne({ _id: id });
-    res.status(200).json(result);
+    res.status(200).json(removePassword(result));
   } catch (err) {
     console.log(err);
     res.status(400).json({ message: "Something went wrong" });
@@ -75,6 +85,7 @@ const login = async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 const register = async (req, res) => {
   try {
     const { firstname, lastname, email, password,phoneNo } = req.body;
@@ -87,7 +98,7 @@ const register = async (req, res) => {
       phoneNo,
     };
     const result = await userModel.create(user);
-    res.status(201).json(result);
+    res.status(201).json(removePassword(result));
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Something went wrong" });
@@ -100,7 +111,7 @@ const addUser = async (req, res) => {
     const hashedpwd = await bcrypt.hash(body.password, 10);
     body.password = hashedpwd;
     const result = await userModel.create(body);
-    res.status(200).json(result);
+    res.status(200).json(removePassword(result));
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Something went wrong" });
@@ -118,7 +129,7 @@ const updateProfile = async (req, res) => {
       body.password = hashedpwd;
     }
     const result = await userModel.findByIdAndUpdate(id, body);
-    res.status(200).json(result);
+    res.status(200).json(removePassword(result));
   } catch (err) {
     console.log(err);
     res.status(400).json({ message: "Something went wrong" });
@@ -135,6 +146,7 @@ const showUsers = async (req, res) => {
     const total = Math.ceil(count / limit);
     const users = await userModel
       .find({ firstname: { $regex: search, $options: "i" } })
+      .select('-password')
       .skip(skip)
       .limit(limit)
       .sort({ updatedAt: -1 });
